@@ -1,0 +1,326 @@
+:root {
+    --brown: #4b2e2a;
+    --brown-light: #8b5e3c;
+    --brown-soft: #f5e9dd;
+    --accent: #f97316;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --bg: #f9fafb;
+    --card: #ffffff;
+    --text: #111827;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+  
+  header {
+    background: linear-gradient(90deg, var(--brown), var(--brown-light));
+    color: #fff;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--brown-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brown);
+    font-weight: 700;
+  }
+  
+  header h1 {
+    font-size: 1.1rem;
+  }
+  
+  header small {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    display: block;
+  }
+  
+  main {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    min-height: calc(100vh - 56px);
+  }
+  
+  nav {
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    padding: 14px;
+  }
+  
+  nav h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: #6b7280;
+  }
+  
+  .menu-btn {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 7px 9px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    cursor: pointer;
+    color: #374151;
+  }
+  
+  .menu-btn.active {
+    background: var(--brown-soft);
+    color: var(--brown);
+    font-weight: 600;
+  }
+  
+  .menu-btn:hover {
+    background: #f3f4f6;
+  }
+  
+  .role-select {
+    margin-top: 12px;
+    font-size: 0.8rem;
+  }
+  
+  .role-select select {
+    width: 100%;
+    padding: 5px 7px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 0.8rem;
+  }
+  
+  section {
+    display: none;
+    padding: 14px 18px;
+  }
+  
+  section.active {
+    display: block;
+  }
+  
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  
+  .card h3 {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  
+  .card strong {
+    font-size: 1.1rem;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    margin-left: 6px;
+  }
+  
+  .badge-ok { background: #dcfce7; color: #166534; }
+  .badge-warn { background: #fef3c7; color: #92400e; }
+  .badge-danger { background: #fee2e2; color: #b91c1c; }
+  
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 12px;
+  }
+  
+  form {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-bottom: 10px;
+  }
+  
+  form h3 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--brown);
+  }
+  
+  .field {
+    margin-bottom: 7px;
+  }
+  
+  .field label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    color: #4b5563;
+  }
+  
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 5px 7px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 0.86rem;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 50px;
+  }
+  
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+  }
+  
+  .btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 11px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .btn-primary {
+    background: var(--brown);
+    color: #fff;
+  }
+  
+  .btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+  }
+  
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+  
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  
+  th, td {
+    padding: 7px 9px;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  
+  th {
+    background: #f3f4f6;
+    font-weight: 600;
+  }
+  
+  tr:nth-child(even) td {
+    background: #f9fafb;
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .tag {
+    padding: 1px 5px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+  }
+  
+  .tag-in { background: #dcfce7; color: #166534; }
+  .tag-out { background: #fee2e2; color: #b91c1c; }
+  
+  .alert {
+    margin-top: 8px;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .links-social a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    text-decoration: none;
+    color: var(--brown);
+    background: var(--brown-soft);
+    padding: 4px 8px;
+    border-radius: 999px;
+  }
+  
+  #chartProdutos {
+    width: 100%;
+    height: 220px;
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  
+  @media (max-width: 900px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    nav h2, .role-select { width: 100%; }
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+  
