@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tlperfumaria - Sistema de Vendas e Estoque</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-mark">TL</div>
+    <div>
+      <h1>tlperfumaria</h1>
+      <small>Vendas de cosméticos, chocolates e perfumaria</small>
+    </div>
+  </div>
+  <div>
+    <div class="links-social">
+      <a href="https://wa.me/5599999999999" target="_blank">WhatsApp</a>
+      <a href="https://instagram.com/seu_perfil" target="_blank">Instagram</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <nav>
+    <h2>Menu</h2>
+    <button class="menu-btn active" data-section="dashboard">Dashboard</button>
+    <button class="menu-btn" data-section="produtos">Produtos / Estoque</button>
+    <button class="menu-btn" data-section="vendas">Vendas / Recibos</button>
+    <button class="menu-btn" data-section="clientes">Clientes / Fidelidade</button>
+    <button class="menu-btn" data-section="financeiro">Financeiro / Boletos</button>
+    <button class="menu-btn" data-section="fornecedores">Fornecedores</button>
+
+    <div class="role-select">
+      <label for="papel">Perfil de acesso</label>
+      <select id="papel">
+        <option value="admin">Administrador (vendas e financeiro)</option>
+        <option value="gerente">Gerente (estoque e fornecedores)</option>
+        <option value="vendedor">Vendedor (PDV)</option>
+      </select>
+    </div>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="active">
+    <h2>Visão geral</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Produtos cadastrados</h3>
+        <strong id="card-total-produtos">0</strong>
+      </div>
+      <div class="card">
+        <h3>Valor total do estoque (custo)</h3>
+        <strong id="card-valor-estoque">R$ 0,00</strong>
+      </div>
+      <div class="card">
+        <h3>Produtos com estoque baixo</h3>
+        <strong id="card-baixo-estoque">0</strong>
+        <span id="badge-baixo" class="badge badge-ok">OK</span>
+      </div>
+      <div class="card">
+        <h3>Vendas hoje</h3>
+        <strong id="card-vendas-hoje">R$ 0,00</strong>
+      </div>
+    </div>
+
+    <h3 style="font-size:0.95rem;margin:8px 0;">Produtos mais vendidos (últimos 30 dias)</h3>
+    <canvas id="chartProdutos"></canvas>
+
+    <div id="dashboard-alertas"></div>
+  </section>
+
+  <!-- PRODUTOS / ESTOQUE -->
+  <section id="produtos">
+    <h2>Produtos e controle de estoque</h2>
+    <div class="grid-2">
+      <form id="form-produto">
+        <h3>Novo produto / edição</h3>
+        <input type="hidden" id="produto-id">
+        <div class="field">
+          <label for="sku">Código de barras / SKU</label>
+          <input id="sku" type="text" placeholder="Leia com leitor ou digite">
+        </div>
+        <div class="field">
+          <label for="nome">Nome</label>
+          <input id="nome" type="text" required>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="categoria">Categoria</label>
+            <select id="categoria">
+              <option value="Perfumaria">Perfumaria</option>
+              <option value="Cosméticos Gerais">Cosméticos Gerais</option>
+              <option value="Chocolate">Chocolate</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="marca">Marca</label>
+            <input id="marca" type="text">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="valor-compra">Valor de compra (R$)</label>
+            <input id="valor-compra" type="number" step="0.01" min="0">
+          </div>
+          <div class="field">
+            <label for="valor-venda">Valor de venda (R$)</label>
+            <input id="valor-venda" type="number" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="estoque-min">Estoque mínimo (alerta)</label>
+            <input id="estoque-min" type="number" min="0" value="1">
+          </div>
+          <div class="field">
+            <label for="estoque-atual">Estoque inicial</label>
+            <input id="estoque-atual" type="number" min="0" value="0">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Salvar produto</button>
+        <button class="btn btn-secondary" type="button" id="btn-limpar-produto">Limpar</button>
+      </form>
+
+      <div>
+        <form id="form-busca-produto">
+          <h3>Buscar / filtrar</h3>
+          <div class="field">
+            <label for="busca-produto">Nome, marca ou categoria</label>
+            <input id="busca-produto" type="text" placeholder="ex.: perfume, hidratante">
+          </div>
+        </form>
+        <table id="tabela-produtos">
+          <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Estoque</th>
+            <th>Min.</th>
+            <th>Venda (R$)</th>
+            <th>Ações</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENDAS -->
+  <section id="vendas">
+    <h2>Vendas, recibos e entrega</h2>
+    <div class="grid-2">
+      <form id="form-venda">
+        <h3>Registrar venda</h3>
+        <div class="field">
+          <label for="venda-cliente">Cliente</label>
+          <select id="venda-cliente"></select>
+        </div>
+        <div class="field">
+          <label for="venda-produto">Produto</label>
+          <select id="venda-produto"></select>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="venda-quantidade">Quantidade</label>
+            <input id="venda-quantidade" type="number" min="1" value="1">
+          </div>
+          <div class="field">
+            <label for="venda-pagamento">Forma de pagamento</label>
+            <select id="venda-pagamento">
+              <option value="avista">À vista</option>
+              <option value="aprazo">À prazo</option>
+              <option value="cartao">Cartão</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="venda-status">Status entrega</label>
+          <select id="venda-status">
+            <option value="separando">Em separação</option>
+            <option value="entrega">Em entrega</option>
+            <option value="entregue">Entregue</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Concluir venda / gerar recibo</button>
+      </form>
+
+      <div>
+        <h3>Últimas vendas</h3>
+        <table id="tabela-vendas">
+          <thead>
+          <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Qtd</th>
+            <th>Total (R$)</th>
+            <th>Pgto</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="recibo-area"></div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section id="clientes">
+    <h2>Cadastro de clientes e fidelidade</h2>
+    <div class="grid-2">
+      <form id="form-cliente">
+        <h3>Novo cliente</h3>
+        <input type="hidden" id="cliente-id">
+        <div class="field">
+          <label for="cliente-nome">Nome</label>
+          <input id="cliente-nome" type="text" required>
+        </div>
+        <div class="field">
+          <label for="cliente-whats">WhatsApp</label>
+          <input id="cliente-whats" type="text" placeholder="(99) 9 9999-9999">
+        </div>
+        <div class="field">
+          <label for="cliente-fidelidade">Programa de fidelidade</label>
+          <select id="cliente-fidelidade">
+            <option value="sim">Participa</option>
+            <option value="nao">Não participa</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Salvar cliente</button>
+      </form>
+
+      <div>
+        <h3>Clientes cadastrados</h3>
+        <table id="tabela-clientes">
+          <thead>
+          <tr>
+            <th>Nome</th>
+            <th>WhatsApp</th>
+            <th>Fidelidade</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCEIRO / BOLETOS -->
+  <section id="financeiro">
+    <h2>Financeiro e boletos</h2>
+    <div class="grid-2">
+      <form id="form-boleto">
+        <h3>Cadastro de boletos</h3>
+        <div class="field">
+          <label for="boleto-descricao">Descrição</label>
+          <input id="boleto-descricao" type="text">
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="boleto-valor">Valor (R$)</label>
+            <input id="boleto-valor" type="number" step="0.01" min="0">
+          </div>
+          <div class="field">
+            <label for="boleto-vencimento">Vencimento</label>
+            <input id="boleto-vencimento" type="date">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Cadastrar boleto</button>
+      </form>
+
+      <div>
+        <h3>Resumo financeiro</h3>
+        <div class="cards">
+          <div class="card">
+            <h3>Total vendido</h3>
+            <strong id="fin-total">R$ 0,00</strong>
+          </div>
+          <div class="card">
+            <h3>À vista / cartão / prazo</h3>
+            <small id="fin-detalhe" style="font-size:0.78rem;"></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORNECEDORES -->
+  <section id="fornecedores">
+    <h2>Fornecedores</h2>
+    <div class="grid-2">
+      <form id="form-fornecedor">
+        <h3>Novo fornecedor</h3>
+        <div class="field">
+          <label for="forn-nome">Nome</label>
+          <input id="forn-nome" type="text">
+        </div>
+        <div class="field">
+          <label for="forn-contato">Contato (telefone / email)</label>
+          <input id="forn-contato" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Salvar fornecedor</button>
+      </form>
+
+      <div>
+        <h3>Lista de fornecedores</h3>
+        <table id="tabela-forn">
+          <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Contato</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // utilidades
+  const fmtMoeda = v => (v || 0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+  const hojeISO = () => new Date().toISOString().slice(0,10);
+  const load = (k, def) => JSON.parse(localStorage.getItem(k) || JSON.stringify(def));
+  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+  let produtos = load('tl_produtos', []);
+  let vendas = load('tl_vendas', []);
+  let clientes = load('tl_clientes', []);
+  let boletos = load('tl_boletos', []);
+  let fornecedores = load('tl_fornecedores', []);
+
+  // navegação
+  document.querySelectorAll('.menu-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.menu-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.section).classList.add('active');
+      renderAll();
+    });
+  });
+
+  // produtos
+  const formProduto = document.getElementById('form-produto');
+  const tabelaProdutos = document.querySelector('#tabela-produtos tbody');
+  const buscaProduto = document.getElementById('busca-produto');
+
+  function saldoProduto(idProd) {
+    const p = produtos.find(p=>p.id===idProd);
+    return p ? p.estoque : 0;
+  }
+
+  function atualizarTabelaProdutos(){
+    tabelaProdutos.innerHTML = '';
+    const termo = buscaProduto.value.toLowerCase();
+    produtos
+      .filter(p => !termo ||
+        p.nome.toLowerCase().includes(termo) ||
+        p.categoria.toLowerCase().includes(termo) ||
+        p.marca.toLowerCase().includes(termo)
+      )
+      .forEach(p=>{
+        const tr = document.createElement('tr');
+        const classeEstoque = p.estoque <= p.estoqueMin ? 'badge-danger' : 'badge-ok';
+        tr.innerHTML = `
+          <td>${p.sku}</td>
+          <td>${p.nome}</td>
+          <td>${p.categoria}</td>
+          <td>${p.estoque} <span class="badge ${classeEstoque}">${p.estoque <= p.estoqueMin ? 'Baixo' : 'OK'}</span></td>
+          <td>${p.estoqueMin}</td>
+          <td>R$ ${fmtMoeda(p.valorVenda)}</td>
+          <td><button class="btn btn-secondary" onclick="editarProduto('${p.id}')">Editar</button></td>
+        `;
+        tabelaProdutos.appendChild(tr);
+      });
+  }
+
+  formProduto.addEventListener('submit', e=>{
+    e.preventDefault();
+    const id = document.getElementById('produto-id').value || Date.now().toString();
+    const obj = {
+      id,
+      sku: document.getElementById('sku').value.trim(),
+      nome: document.getElementById('nome').value.trim(),
+      categoria: document.getElementById('categoria').value,
+      marca: document.getElementById('marca').value.trim(),
+      valorCompra: Number(document.getElementById('valor-compra').value || 0),
+      valorVenda: Number(document.getElementById('valor-venda').value || 0),
+      estoqueMin: Number(document.getElementById('estoque-min').value || 0),
+      estoque: Number(document.getElementById('estoque-atual').value || 0)
+    };
+    const idx = produtos.findIndex(p=>p.id===id);
+    if (idx>=0) produtos[idx]=obj; else produtos.push(obj);
+    save('tl_produtos', produtos);
+    formProduto.reset();
+    document.getElementById('estoque-min').value = 1;
+    document.getElementById('estoque-atual').value = 0;
+    document.getElementById('produto-id').value = '';
+    atualizarTabelaProdutos();
+    atualizarCombosProdutos();
+    atualizarDashboard();
+    alert('Produto salvo!');
+  });
+
+  document.getElementById('btn-limpar-produto').addEventListener('click', ()=>{
+    formProduto.reset();
+    document.getElementById('produto-id').value = '';
+    document.getElementById('estoque-min').value = 1;
+    document.getElementById('estoque-atual').value = 0;
+  });
+
+  function editarProduto(id){
+    const p = produtos.find(p=>p.id===id);
+    if (!p) return;
+    document.getElementById('produto-id').value = p.id;
+    document.getElementById('sku').value = p.sku;
+    document.getElementById('nome').value = p.nome;
+    document.getElementById('categoria').value = p.categoria;
+    document.getElementById('marca').value = p.marca;
+    document.getElementById('valor-compra').value = p.valorCompra;
+    document.getElementById('valor-venda').value = p.valorVenda;
+    document.getElementById('estoque-min').value = p.estoqueMin;
+    document.getElementById('estoque-atual').value = p.estoque;
+  }
+  window.editarProduto = editarProduto;
+
+  buscaProduto.addEventListener('input', atualizarTabelaProdutos);
+
+  // clientes
+  const formCliente = document.getElementById('form-cliente');
+  const tabelaClientes = document.querySelector('#tabela-clientes tbody');
+  const selectClienteVenda = document.getElementById('venda-cliente');
+
+  formCliente.addEventListener('submit', e=>{
+    e.preventDefault();
+    const obj = {
+      id: Date.now().toString(),
+      nome: document.getElementById('cliente-nome').value.trim(),
+      whats: document.getElementById('cliente-whats').value.trim(),
+      fidelidade: document.getElementById('cliente-fidelidade').value
+    };
+    clientes.push(obj);
+    save('tl_clientes', clientes);
+    formCliente.reset();
+    renderClientes();
+    atualizarCombosClientes();
+  });
+
+  function renderClientes(){
+    tabelaClientes.innerHTML = '';
+    clientes.forEach(c=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${c.nome}</td>
+        <td>${c.whats}</td>
+        <td>${c.fidelidade === 'sim' ? 'Participa' : 'Não'}</td>
+      `;
+      tabelaClientes.appendChild(tr);
+    });
+  }
+
+  function atualizarCombosClientes(){
+    selectClienteVenda.innerHTML = '';
+    clientes.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.nome;
+      selectClienteVenda.appendChild(opt);
+    });
+  }
+
+  // vendas
+  const formVenda = document.getElementById('form-venda');
+  const tabelaVendas = document.querySelector('#tabela-vendas tbody');
+  const selectProdutoVenda = document.getElementById('venda-produto');
+  const reciboArea = document.getElementById('recibo-area');
+
+  function atualizarCombosProdutos(){
+    selectProdutoVenda.innerHTML = '';
+    produtos.forEach(p=>{
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.nome} (R$ ${fmtMoeda(p.valorVenda)})`;
+      selectProdutoVenda.appendChild(opt);
+    });
+  }
+
+  formVenda.addEventListener('submit', e=>{
+    e.preventDefault();
+    if (!produtos.length || !clientes.length) {
+      alert('Cadastre ao menos um produto e um cliente.');
+      return;
+    }
+    const prodId = selectProdutoVenda.value;
+    const cliId = selectClienteVenda.value;
+    const qtd = Number(document.getElementById('venda-quantidade').value || 1);
+    const pg = document.getElementById('venda-pagamento').value;
+    const status = document.getElementById('venda-status').value;
+
+    const prod = produtos.find(p=>p.id===prodId);
+    const cli = clientes.find(c=>c.id===cliId);
+    if (!prod || !cli) return;
+
+    if (prod.estoque < qtd) {
+      alert('Estoque insuficiente!');
+      return;
+    }
+
+    const total = prod.valorVenda * qtd;
+    const venda = {
+      id: Date.now().toString(),
+      produtoId: prodId,
+      clienteId: cliId,
+      quantidade: qtd,
+      pagamento: pg,
+      status,
+      total,
+      data: new Date().toISOString()
+    };
+    vendas.push(venda);
+    save('tl_vendas', vendas);
+
+    prod.estoque -= qtd;
+    save('tl_produtos', produtos);
+
+    renderVendas();
+    atualizarTabelaProdutos();
+    atualizarDashboard();
+    renderFinanceiro();
+    gerarRecibo(venda);
+    alert('Venda registrada e recibo gerado!');
+  });
+
+  function renderVendas(){
+    tabelaVendas.innerHTML = '';
+    [...vendas].sort((a,b)=>b.data.localeCompare(a.data)).slice(0,10).forEach(v=>{
+      const prod = produtos.find(p=>p.id===v.produtoId);
+      const cli = clientes.find(c=>c.id===v.clienteId);
+      const tr = document.createElement('tr');
+      const data = new Date(v.data).toLocaleString('pt-BR');
+      tr.innerHTML = `
+        <td>${data}</td>
+        <td>${cli ? cli.nome : '-'}</td>
+        <td>${prod ? prod.nome : '-'}</td>
+        <td>${v.quantidade}</td>
+        <td>R$ ${fmtMoeda(v.total)}</td>
+        <td>${v.pagamento}</td>
+      `;
+      tabelaVendas.appendChild(tr);
+    });
+  }
+
+  function gerarRecibo(v){
+    const prod = produtos.find(p=>p.id===v.produtoId);
+    const cli = clientes.find(c=>c.id===v.clienteId);
+    const data = new Date(v.data).toLocaleString('pt-BR');
+    reciboArea.innerHTML = `
+      <div class="card" style="margin-top:10px;">
+        <h3 style="margin-bottom:4px;">Recibo de venda / Comprovante fiscal</h3>
+        <p style="font-size:0.8rem;">
+          <strong>Data:</strong> ${data}<br>
+          <strong>Cliente:</strong> ${cli ? cli.nome : '-'}<br>
+          <strong>Produto:</strong> ${prod ? prod.nome : '-'}<br>
+          <strong>Quantidade:</strong> ${v.quantidade}<br>
+          <strong>Total:</strong> R$ ${fmtMoeda(v.total)}<br>
+          <strong>Pagamento:</strong> ${v.pagamento}<br>
+          <strong>Status entrega:</strong> ${v.status}
+        </p>
+        <p style="font-size:0.75rem;margin-top:4px;">Documento válido como comprovante para controle interno da tlperfumaria.</p>
+      </div>
+    `;
+  }
+
+  // boletos / financeiro
+  const formBoleto = document.getElementById('form-boleto');
+  const finTotal = document.getElementById('fin-total');
+  const finDetalhe = document.getElementById('fin-detalhe');
+
+  formBoleto.addEventListener('submit', e=>{
+    e.preventDefault();
+    const obj = {
+      id: Date.now().toString(),
+      descricao: document.getElementById('boleto-descricao').value.trim(),
+      valor: Number(document.getElementById('boleto-valor').value || 0),
+      vencimento: document.getElementById('boleto-vencimento').value || hojeISO()
+    };
+    boletos.push(obj);
+    save('tl_boletos', boletos);
+    formBoleto.reset();
+    alert('Boleto cadastrado (simulação).');
+  });
+
+  function renderFinanceiro(){
+    let total = 0, av=0, ap=0, cart=0;
+    vendas.forEach(v=>{
+      total += v.total;
+      if (v.pagamento==='avista') av += v.total;
+      if (v.pagamento==='aprazo') ap += v.total;
+      if (v.pagamento==='cartao') cart += v.total;
+    });
+    finTotal.textContent = 'R$ ' + fmtMoeda(total);
+    finDetalhe.textContent =
+      `À vista: R$ ${fmtMoeda(av)} | Cartão: R$ ${fmtMoeda(cart)} | À prazo: R$ ${fmtMoeda(ap)}`;
+  }
+
+  // fornecedores
+  const formForn = document.getElementById('form-fornecedor');
+  const tabelaForn = document.querySelector('#tabela-forn tbody');
+
+  formForn.addEventListener('submit', e=>{
+    e.preventDefault();
+    const obj = {
+      id: Date.now().toString(),
+      nome: document.getElementById('forn-nome').value.trim(),
+      contato: document.getElementById('forn-contato').value.trim()
+    };
+    fornecedores.push(obj);
+    save('tl_fornecedores', fornecedores);
+    formForn.reset();
+    renderFornecedores();
+  });
+
+  function renderFornecedores(){
+    tabelaForn.innerHTML = '';
+    fornecedores.forEach(f=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${f.nome}</td><td>${f.contato}</td>`;
+      tabelaForn.appendChild(tr);
+    });
+  }
+
+  // dashboard e gráfico
+  const cardTotalProdutos = document.getElementById('card-total-produtos');
+  const cardValorEstoque = document.getElementById('card-valor-estoque');
+  const cardBaixoEstoque = document.getElementById('card-baixo-estoque');
+  const cardVendasHoje = document.getElementById('card-vendas-hoje');
+  const badgeBaixo = document.getElementById('badge-baixo');
+  const dashAlertas = document.getElementById('dashboard-alertas');
+  const ctxChart = document.getElementById('chartProdutos').getContext('2d');
+
+  function varBrown(){ return getComputedStyle(document.documentElement).getPropertyValue('--brown'); }
+
+  function atualizarDashboard(){
+    cardTotalProdutos.textContent = produtos.length;
+    let valorTotal = 0;
+    let baixo = 0;
+    produtos.forEach(p=>{
+      valorTotal += p.valorCompra * p.estoque;
+      if (p.estoque <= p.estoqueMin) baixo++;
+    });
+    cardValorEstoque.textContent = 'R$ ' + fmtMoeda(valorTotal);
+    cardBaixoEstoque.textContent = baixo;
+    badgeBaixo.textContent = baixo ? 'Atenção' : 'OK';
+    badgeBaixo.className = 'badge ' + (baixo ? 'badge-danger' : 'badge-ok');
+
+    const hoje = new Date().toISOString().slice(0,10);
+    let totalHoje = 0;
+    vendas.forEach(v=>{
+      if (v.data.slice(0,10) === hoje) totalHoje += v.total;
+    });
+    cardVendasHoje.textContent = 'R$ ' + fmtMoeda(totalHoje);
+
+    dashAlertas.innerHTML = '';
+    if (baixo) {
+      dashAlertas.innerHTML = `<div class="alert"><strong>Atenção:</strong> ${baixo} produto(s) com estoque abaixo do mínimo. Reabastecer.</div>`;
+    }
+
+    const limiteDias = 30;
+    const agora = new Date();
+    const mapa = {};
+    vendas.forEach(v=>{
+      const dataV = new Date(v.data);
+      const diff = (agora - dataV)/(1000*60*60*24);
+      if (diff <= limiteDias) {
+        mapa[v.produtoId] = (mapa[v.produtoId] || 0) + v.quantidade;
+      }
+    });
+
+    const labels = [];
+    const dados = [];
+    Object.keys(mapa).forEach(id=>{
+      const p = produtos.find(p=>p.id===id);
+      labels.push(p ? p.nome : id);
+      dados.push(mapa[id]);
+    });
+
+    const ctx = ctxChart;
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(0,0,w,h);
+    const max = Math.max(...dados, 1);
+    const barWidth = labels.length ? (w - 40)/labels.length : 0;
+    ctx.fillStyle = varBrown();
+    ctx.font = "10px sans-serif";
+    labels.forEach((lbl, i)=>{
+      const val = dados[i];
+      const barHeight = (h - 40) * (val / max);
+      const x = 20 + i * barWidth;
+      const y = h - 20 - barHeight;
+      ctx.fillRect(x, y, barWidth*0.6, barHeight);
+      ctx.fillText(lbl.substring(0,10), x, h-8);
+    });
+  }
+
+  function renderAll(){
+    atualizarTabelaProdutos();
+    renderClientes();
+    renderVendas();
+    renderFinanceiro();
+    renderFornecedores();
+    atualizarCombosProdutos();
+    atualizarCombosClientes();
+    atualizarDashboard();
+  }
+
+  renderAll();
+</script>
+</body>
+</html>
