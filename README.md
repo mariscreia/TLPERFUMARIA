@@ -1,14 +1,14 @@
- TL Perfumaria
+## TL Perfumaria
 
 Sistema de gestão desenvolvido para simular o controle de uma perfumaria. 
 O projeto permite cadastrar produtos, gerenciar estoque, registrar vendas, controlar clientes, fornecedores e 
 informações financeiras, utilizando HTML, CSS e JavaScript.
 
- Tecnologias
+## Tecnologias
 - HTML5
 - CSS3
 
- Funcionalidades
+## Funcionalidades
 
 - Cadastro de produtos
 - Controle de estoque
